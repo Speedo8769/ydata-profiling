@@ -52,6 +52,7 @@ def to_category(series: pd.Series, state: dict) -> pd.Series:
     val = series.astype(str)
     if hasnans:
         val = val.replace("nan", np.nan)
+        val = val.replace("<NA>", np.nan)
 
     return val.astype("string")
 
@@ -73,8 +74,8 @@ def string_is_category(series: pd.Series, state: dict, k: Settings) -> bool:
     - (distinct values / count of all values) is less than threshold
     - is not bool"""
     n_unique = series.nunique()
-    unique_threshold = k.vars.text.percentage_cat_threshold
-    threshold = k.vars.text.categorical_threshold
+    unique_threshold = k.vars.cat.percentage_cat_threshold
+    threshold = k.vars.cat.cardinality_threshold
     return (
         1 <= n_unique <= threshold
         and (

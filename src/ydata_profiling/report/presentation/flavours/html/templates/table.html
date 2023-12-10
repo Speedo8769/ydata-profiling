@@ -19,10 +19,10 @@
                     <th>{{ row['name'] }}</th>
                     {% if row['value'].__class__.__name__ == 'list' %}
                         {% for value in row['value'] %}
-                            <td>{{ value }}{% if loop.last and 'hint' in row %} {{ row['hint'] }}{% endif %}</td>
+                            <td style="white-space:pre white-space:nowrap">{{ value }}{% if loop.last and 'hint' in row %} {{ row['hint'] }}{% endif %}</td>
                         {% endfor %}
                     {% else %}
-                        <td>{{ row['value'] }}{% if 'hint' in row %} {{ row['hint'] }}{% endif %}</td>
+                        <td style="white-space:pre white-space:nowrap">{{ row['value'] }}{% if 'hint' in row %} {{ row['hint'] }}{% endif %}</td>
                     {% endif %}
                 </tr>
             {% endfor %}

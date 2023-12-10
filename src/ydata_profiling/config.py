@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import yaml
-from pydantic import BaseModel, BaseSettings, Field, PrivateAttr
+from pydantic.v1 import BaseModel, BaseSettings, Field, PrivateAttr
 
 
 def _merge_dictionaries(dict1: dict, dict2: dict) -> dict:
@@ -50,17 +50,16 @@ class TextVars(BaseModel):
     words: bool = True
     characters: bool = True
     redact: bool = False
-    # if text has more than threshold categories, its not category
-    categorical_threshold: int = 50
-    # if text has more than threshold % distinct values, its not category
-    percentage_cat_threshold: float = 0.5
 
 
 class CatVars(BaseModel):
     length: bool = True
     characters: bool = True
     words: bool = True
+    # if var has more than threshold categories, it's a text var
     cardinality_threshold: int = 50
+    # if var has more than threshold % distinct values, it's a text var
+    percentage_cat_threshold: float = 0.5
     imbalance_threshold: float = 0.5
     n_obs: int = 5
     # Set to zero to disable
@@ -149,6 +148,7 @@ class Histogram(BaseModel):
     # Maximum number of bins (when bins=0)
     max_bins: int = 250
     x_axis_labels: bool = True
+    density: bool = False
 
 
 class CatFrequencyPlot(BaseModel):
@@ -348,7 +348,7 @@ class Settings(BaseSettings):
     # Report rendering
     report: Report = Report()
     html: Html = Html()
-    notebook = Notebook()
+    notebook: Notebook = Notebook()
 
     def update(self, updates: dict) -> "Settings":
         update = _merge_dictionaries(self.dict(), updates)
@@ -366,7 +366,7 @@ class Settings(BaseSettings):
         with open(config_file) as f:
             data = yaml.safe_load(f)
 
-        return Settings().parse_obj(data)
+        return Settings.parse_obj(data)
 
 
 class SparkSettings(Settings):
@@ -379,7 +379,7 @@ class SparkSettings(Settings):
 
     vars.num.low_categorical_threshold = 0
 
-    infer_dtypes = False
+    infer_dtypes: bool = False
 
     correlations: Dict[str, Correlation] = {
         "spearman": Correlation(key="spearman", calculate=True),
